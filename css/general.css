@@ -12,21 +12,21 @@ header {
     
 }
 nav {
-    display: flex;                  /* Coloca a los hijos (los enlaces) en fila horizontal */
-    justify-content: center;        /* Los centra horizontalmente en la pantalla */
-    align-items: center;            /* Los alinea verticalmente */
-    gap: 20px;                      /* Distancia exacta entre cada enlace */
-    margin: 20px 0;                 /* Margen arriba y abajo del menú */
+    display: flex;                 
+    justify-content: center;        
+    align-items: center;           
+    gap: 20px;                    
+    margin: 20px 0;                 
     flex-wrap: nowrap;
 
     a{
-        text-decoration: none;          /* Quita el subrayado morado/azul predeterminado */
-    color: #007bff;                 /* Color del texto */
+        text-decoration: none;        
+    color: #007bff;                
     font-weight: 600;
     font-size: 16px;
     padding: 8px 14px;
     border-radius: 4px;
-    white-space: nowrap;            /* Impide que el texto de un enlace se rompa en 2 líneas */
+    white-space: nowrap;           
     transition: background-color 0.3s ease, color 0.3s ease;
     }
 
