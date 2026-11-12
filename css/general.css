@@ -1,0 +1,33 @@
+header {
+    margin: 0 auto;
+    display: block;
+    
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+    h1 {
+        text-align: center;
+    }
+    
+}
+nav {
+    display: flex;                  /* Coloca a los hijos (los enlaces) en fila horizontal */
+    justify-content: center;        /* Los centra horizontalmente en la pantalla */
+    align-items: center;            /* Los alinea verticalmente */
+    gap: 20px;                      /* Distancia exacta entre cada enlace */
+    margin: 20px 0;                 /* Margen arriba y abajo del menú */
+    flex-wrap: nowrap;
+
+    a{
+        text-decoration: none;          /* Quita el subrayado morado/azul predeterminado */
+    color: #007bff;                 /* Color del texto */
+    font-weight: 600;
+    font-size: 16px;
+    padding: 8px 14px;
+    border-radius: 4px;
+    white-space: nowrap;            /* Impide que el texto de un enlace se rompa en 2 líneas */
+    transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+}

@@ -1,26 +1,18 @@
 <?php
-session_start();
+require_once 'includes/header.php';
 
+// Protección de ruta privada
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: login.php");
     exit();
 }
+
+require_once 'includes/nav.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Panel Privado</title>
-</head>
-<body>
-    <main>
-        <h1>¡Bienvenido/a, <?php echo htmlspecialchars($_SESSION['usuario_nombre']); ?>!</h1>
-        <p>Has iniciado sesión correctamente en la zona privada del sistema.</p>
-        
-        <hr>
-        
-        <p><a href="cierre.php">Cerrar Sesión</a></p>
-    </main>
-</body>
-</html>
+<main>
+    <h2>Panel Privado</h2>
+    <p>¡Hola, <strong><?php echo htmlspecialchars($_SESSION['usuario_nombre']); ?></strong>! Has ingresado con éxito al área protegida.</p>
+</main>
+
+<?php require_once 'includes/footer.php'; ?>

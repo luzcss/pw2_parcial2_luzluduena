@@ -1,116 +1,95 @@
 <?php
-// 1. Iniciar sesión e incluir la conexión
-session_start();
 require_once 'includes/conexion.php';
+require_once 'includes/header.php';
+require_once 'includes/nav.php';
 
 $errores = [];
+$correo_guardado = $_COOKIE['recordar_email'] ?? '';
 
-// Recuperar Cookie de "Recordarme" si existe
-$correo_guardado = isset($_COOKIE['recordar_email']) ? $_COOKIE['recordar_email'] : '';
-
-// 2. Procesar el formulario cuando el usuario presiona "Entrar"
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $correo = trim($_POST['correo'] ?? '');
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email'] ?? '');
     $password = trim($_POST['password'] ?? '');
     $recordar = isset($_POST['recordar']);
 
-    if (empty($correo) || empty($password)) {
+    if (empty($email) || empty($password)) {
         $errores[] = "Todos los campos son obligatorios.";
     }
 
     if (empty($errores)) {
-        // Consulta preparada para evitar Inyección SQL
+        // Consulta preparada para login
         $sql = "SELECT id, nombre, password FROM usuarios WHERE email = ?";
         $stmt = mysqli_prepare($conexion, $sql);
+        mysqli_stmt_bind_param($stmt, "s", $email);
+        mysqli_stmt_execute($stmt);
+        $resultado = mysqli_stmt_get_result($stmt);
 
-        if ($stmt) {
-            mysqli_stmt_bind_param($stmt, "s", $correo);
-            mysqli_stmt_execute($stmt);
-            $resultado = mysqli_stmt_get_result($stmt);
+        if ($fila = mysqli_fetch_assoc($resultado)) {
+            if (password_verify($password, $fila['password'])) {
+                session_regenerate_id(true);
+                $_SESSION['usuario_id'] = $fila['id'];
+                $_SESSION['usuario_nombre'] = $fila['nombre'];
 
-            if ($fila = mysqli_fetch_assoc($resultado)) {
-                // Verificar la contraseña encriptada
-                if (password_verify($password, $fila['password'])) {
-                    
-                    // Regenerar ID de sesión por seguridad
-                    session_regenerate_id(true);
-                    $_SESSION['usuario_id'] = $fila['id'];
-                    $_SESSION['usuario_nombre'] = $fila['nombre'];
-
-                    // Guardar o eliminar Cookie "Recordarme" por 30 días
-                    if ($recordar) {
-                        setcookie("recordar_email", $correo, time() + (86400 * 30), "/");
-                    } else {
-                        setcookie("recordar_email", "", time() - 3600, "/");
-                    }
-
-                    // Redirigir al panel privado
-                    header("Location: panel.php");
-                    exit();
+                // Gestión de la superglobal $_COOKIE
+                if ($recordar) {
+                    setcookie("recordar_email", $email, time() + (86400 * 30), "/");
                 } else {
-                    $errores[] = "La contraseña es incorrecta.";
+                    setcookie("recordar_email", "", time() - 3600, "/");
                 }
+
+                header("Location: panel.php");
+                exit();
             } else {
-                $errores[] = "No existe un usuario registrado con ese correo.";
+                $errores[] = "Contraseña incorrecta.";
             }
-            mysqli_stmt_close($stmt);
         } else {
-            $errores[] = "Error al conectar con la base de datos.";
+            $errores[] = "No existe un usuario con ese correo electrónico.";
         }
+        mysqli_stmt_close($stmt);
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Iniciar Sesión</title>
-</head>
-<body>
-    <main>
-        <h2>Iniciar Sesión</h2>
 
-        <!-- Mensaje de éxito si viene desde el registro -->
-        <?php if (isset($_SESSION['flash_exito'])): ?>
-            <div style="color: green; border: 1px solid green; padding: 10px; margin-bottom: 20px;">
-                <?php 
-                    echo htmlspecialchars($_SESSION['flash_exito']); 
-                    unset($_SESSION['flash_exito']);
-                ?>
-            </div>
-        <?php endif; ?>
+<main>
+    <h2>Iniciar Sesión</h2>
 
-        <!-- Listado de Errores -->
-        <?php if (!empty($errores)): ?>
-            <div style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 20px;">
-                <ul>
-                    <?php foreach ($errores as $error): ?>
-                        <li><?php echo htmlspecialchars($error); ?></li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-        <?php endif; ?>
+    <!-- Mensaje Flash procedente de Registro -->
+    <?php if (isset($_SESSION['flash_exito'])): ?>
+        <div style="color: green; border: 1px solid green; padding: 10px; margin-bottom: 15px;">
+            <?php 
+                echo htmlspecialchars($_SESSION['flash_exito']); 
+                unset($_SESSION['flash_exito']);
+            ?>
+        </div>
+    <?php endif; ?>
 
-        <form action="login.php" method="POST">
-            <div>
-                <label for="correo">Correo Electrónico:</label><br>
-                <input type="email" id="correo" name="correo" value="<?php echo htmlspecialchars($correo_guardado); ?>" required>
-            </div>
-            <br>
-            <div>
-                <label for="password">Contraseña:</label><br>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <br>
-            <div>
-                <input type="checkbox" id="recordar" name="recordar" <?php echo !empty($correo_guardado) ? 'checked' : ''; ?>>
-                <label for="recordar">Recordar mi correo en este navegador</label>
-            </div>
-            <br>
-            <button type="submit">Entrar</button>
-        </form>
+    <?php if (!empty($errores)): ?>
+        <div style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 15px;">
+            <ul>
+                <?php foreach ($errores as $error): ?>
+                    <li><?php echo htmlspecialchars($error); ?></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    <?php endif; ?>
 
-        <p>¿No tienes cuenta? <a href="registro.php">Regístrate aquí</a></p>
-    </main>
-</body>
-</html>
+    <form action="login.php" method="POST">
+        <div>
+            <label for="email">Correo Electrónico:</label><br>
+            <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($correo_guardado); ?>" required>
+        </div>
+        <br>
+        <div>
+            <label for="password">Contraseña:</label><br>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <br>
+        <div>
+            <input type="checkbox" id="recordar" name="recordar" <?php echo !empty($correo_guardado) ? 'checked' : ''; ?>>
+            <label for="recordar">Recordar mi correo en este navegador</label>
+        </div>
+        <br>
+        <button type="submit">Entrar</button>
+    </form>
+</main>
+
+<?php require_once 'includes/footer.php'; ?>
