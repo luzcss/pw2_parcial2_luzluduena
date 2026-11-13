@@ -17,5 +17,5 @@ if (session_status() === PHP_SESSION_NONE) {
 </head>
 <body>
 <header>
-    <h1>Sistema Web de Autenticación</h1>
+    <img src="img/SWAG.png" height="60vh" alt="swag">
 </header>

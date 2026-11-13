@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errores)) {
-        // Consulta preparada para login
+     
         $sql = "SELECT id, nombre, password FROM usuarios WHERE email = ?";
         $stmt = mysqli_prepare($conexion, $sql);
         mysqli_stmt_bind_param($stmt, "s", $email);
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['usuario_id'] = $fila['id'];
                 $_SESSION['usuario_nombre'] = $fila['nombre'];
 
-                // Gestión de la superglobal $_COOKIE
+               
                 if ($recordar) {
                     setcookie("recordar_email", $email, time() + (86400 * 30), "/");
                 } else {
@@ -49,47 +49,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<main>
-    <h2>Iniciar Sesión</h2>
+<main style="display: flex; justify-content: center; padding: 40px 20px;">
+    <div class="formularioConte">
+        <h2>Iniciar Sesión</h2>
 
-    <!-- Mensaje Flash procedente de Registro -->
-    <?php if (isset($_SESSION['flash_exito'])): ?>
-        <div style="color: green; border: 1px solid green; padding: 10px; margin-bottom: 15px;">
-            <?php 
-                echo htmlspecialchars($_SESSION['flash_exito']); 
-                unset($_SESSION['flash_exito']);
-            ?>
-        </div>
-    <?php endif; ?>
+        
+        <?php if (isset($_SESSION['flash_exito'])): ?>
+            <div style="background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 12px; border-radius: 4px; margin-bottom: 20px; font-size: 0.9rem; text-align: center;">
+                <?php 
+                    echo htmlspecialchars($_SESSION['flash_exito']); 
+                    unset($_SESSION['flash_exito']);
+                ?>
+            </div>
+        <?php endif; ?>
 
-    <?php if (!empty($errores)): ?>
-        <div style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 15px;">
-            <ul>
-                <?php foreach ($errores as $error): ?>
-                    <li><?php echo htmlspecialchars($error); ?></li>
-                <?php endforeach; ?>
-            </ul>
-        </div>
-    <?php endif; ?>
+       
+        <?php if (!empty($errores)): ?>
+            <div class="alerta-error">
+                <ul style="margin: 0; padding-left: 20px;">
+                    <?php foreach ($errores as $error): ?>
+                        <li><?php echo htmlspecialchars($error); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
 
-    <form action="login.php" method="POST">
-        <div>
-            <label for="email">Correo Electrónico:</label><br>
-            <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($correo_guardado); ?>" required>
-        </div>
-        <br>
-        <div>
-            <label for="password">Contraseña:</label><br>
-            <input type="password" id="password" name="password" required>
-        </div>
-        <br>
-        <div>
-            <input type="checkbox" id="recordar" name="recordar" <?php echo !empty($correo_guardado) ? 'checked' : ''; ?>>
-            <label for="recordar">Recordar mi correo en este navegador</label>
-        </div>
-        <br>
-        <button type="submit">Entrar</button>
-    </form>
+        <form action="login.php" method="POST" class="formuEstilo">
+            <div class="grupo-input">
+                <label for="email">Correo Electrónico:</label>
+                <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($correo_guardado); ?>" required>
+            </div>
+            
+            <div class="grupo-input">
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+           
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 0.9rem; color: #555;">
+                <input type="checkbox" id="recordar" name="recordar" <?php echo !empty($correo_guardado) ? 'checked' : ''; ?> style="width: auto;">
+                <label for="recordar" style="margin: 0; font-weight: normal; cursor: pointer;">Recordar mi correo</label>
+            </div>
+            
+            <button type="submit" class="btnFormulario">Entrar</button>
+            
+            <p style="text-align: center; margin-top: 15px; font-size: 0.9rem;">
+                ¿No tienes cuenta? <a href="registro.php" style="color: #82e0cf; font-weight: bold; text-decoration: none;">Regístrate</a>
+            </p>
+        </form>
+    </div>
 </main>
 
 <?php require_once 'includes/footer.php'; ?>

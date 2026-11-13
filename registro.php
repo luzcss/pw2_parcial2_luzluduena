@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
     $password = trim($_POST['password'] ?? '');
 
-    // Validaciones en servidor
+
     if (empty($nombre) || empty($email) || empty($password)) {
         $errores[] = "Todos los campos son obligatorios.";
     }
@@ -22,9 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errores)) {
-        // Consulta preparada para verificar si el correo ya existe
+       
         $sql_check = "SELECT id FROM usuarios WHERE email = ?";
-        $stmt_check = mysqli_prepare($conexion, $sql_check);
+        $stmt_check = mysqli_prepare($conexion, $sql_check);    
         mysqli_stmt_bind_param($stmt_check, "s", $email);
         mysqli_stmt_execute($stmt_check);
         mysqli_stmt_store_result($stmt_check);
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errores)) {
-        // Encriptar contraseña e insertar
+        
         $password_hash = password_hash($password, PASSWORD_DEFAULT);
         $sql_insert = "INSERT INTO usuarios (nombre, email, password) VALUES (?, ?, ?)";
         $stmt_insert = mysqli_prepare($conexion, $sql_insert);
@@ -54,37 +54,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<main>
-    <h2>Formulario de Registro</h2>
+<main style="display: flex; justify-content: center; padding: 40px 20px;">
+    <div class="formularioConte">
+        <h2>Crear Cuenta</h2>
 
-    <?php if (!empty($errores)): ?>
-        <div style="color: red; border: 1px solid red; padding: 10px; margin-bottom: 15px;">
-            <ul>
-                <?php foreach ($errores as $error): ?>
-                    <li><?php echo htmlspecialchars($error); ?></li>
-                <?php endforeach; ?>
-            </ul>
-        </div>
-    <?php endif; ?>
+        <?php if (!empty($errores)): ?>
+            <div class="alerta-error">
+                <ul style="margin: 0; padding-left: 20px;">
+                    <?php foreach ($errores as $error): ?>
+                        <li><?php echo htmlspecialchars($error); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
 
-    <form action="registro.php" method="POST">
-        <div>
-            <label for="nombre">Nombre completo:</label><br>
-            <input type="text" id="nombre" name="nombre" value="<?php echo htmlspecialchars($nombre); ?>" required>
-        </div>
-        <br>
-        <div>
-            <label for="email">Correo Electrónico:</label><br>
-            <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" required>
-        </div>
-        <br>
-        <div>
-            <label for="password">Contraseña:</label><br>
-            <input type="password" id="password" name="password" required>
-        </div>
-        <br>
-        <button type="submit">Registrarse</button>
-    </form>
+        <form action="registro.php" method="POST" class="formuEstilo">
+            <div class="grupo-input">
+                <label for="nombre">Nombre completo:</label>
+                <input type="text" id="nombre" name="nombre" value="<?php echo htmlspecialchars($nombre); ?>" required>
+            </div>
+            
+            <div class="grupo-input">
+                <label for="email">Correo Electrónico:</label>
+                <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" required>
+            </div>
+            
+            <div class="grupo-input">
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <button type="submit" class="btnFormulario">Registrarse</button>
+            
+            <p style="text-align: center; margin-top: 15px; font-size: 0.9rem;">
+                ¿Ya tienes una cuenta? <a href="login.php" style="color: #82e0cf; font-weight: bold; text-decoration: none;">Inicia sesión</a>
+            </p>
+        </form>
+    </div>
 </main>
-
-<?php require_once 'includes/footer.php'; ?>
