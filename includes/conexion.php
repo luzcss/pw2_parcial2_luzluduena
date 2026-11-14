@@ -1,17 +1,24 @@
 <?php
+$esLocal = ($_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1');
 
-$servidor = "localhost";
+if ($esLocal) {
+    
+define('BASE_URL', '/repoGithub');
+
+$servidor = "127.0.0.1";
 $usuario = "root"; 
 $password = "";    
-$base_de_datos = "parcial_web"; 
+$baseDatos = "parcial_web"; 
 
+} else {
 
-$conexion = mysqli_connect($servidor, $usuario, $password, $base_de_datos);
+define('BASE_URL', '');
 
-if (!$conexion) {
-    die("Error de conexión a la base de datos: " . mysqli_connect_error());
+$servidor = "sql101.infinityfree.com";
+$usuario = "if0_43435096"; 
+$password = "qDyj9iWR55DE";    
+$baseDatos = "if0_43435096_coolswag"; 
 }
 
-
-mysqli_set_charset($conexion, "utf8");
 ?>
+
